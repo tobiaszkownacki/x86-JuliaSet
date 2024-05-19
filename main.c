@@ -2,20 +2,30 @@
 #include <stdlib.h>
 #include <allegro5/allegro.h>
 #include "julia_set.h"
+#define WIDTH 800
+#define HEIGHT 800
 
-int WIDTH = 800;
-int HEIGHT = 600;
-
+double c_real = 0, c_imag = 0;
+double x_centre = 0, y_centre = 0;
+double scale = 0.005;
 
 
 void draw(ALLEGRO_DISPLAY *display)
 {
-    al_clear_to_color(al_map_rgb(125, 100, 25));
+    // come calculations
+    double disp_x_left = x_centre - WIDTH / 2.0 * scale;
+    double disp_y_up = y_centre - HEIGHT / 2.0 * scale;
 
     ALLEGRO_LOCKED_REGION *locked = al_lock_bitmap(al_get_backbuffer(display), ALLEGRO_PIXEL_FORMAT_RGB_888, ALLEGRO_LOCK_READWRITE);
 
-    // come calucations
+    // debug stuff
+    printf("c_real: %f, c_imag: %f\n", c_real, c_imag);
+    printf("x_centre: %f, y_centre: %f\n", x_centre, y_centre);
+    printf("disp_x_left: %f, disp_y_up: %f\n", disp_x_left, disp_y_up);
+    printf("scale: %f\n", scale);
+    printf("locked->pitch: %d\n", locked->pitch);
 
+    julia_set(locked->data, locked->pitch, WIDTH, HEIGHT, c_real, c_imag, scale, disp_x_left, disp_y_up);
 
     al_unlock_bitmap(al_get_backbuffer(display));
     al_flip_display();
@@ -42,19 +52,52 @@ int main()
     // create event
     ALLEGRO_EVENT event;
 
+    int mouse_buttom = 0;
+
     while(true)
     {
         al_wait_for_event(event_queue, &event);
 
         if(event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
+            break;  // quit if click X on display
+
+        if (event.keyboard.keycode == ALLEGRO_KEY_ESCAPE
+            && event.type == ALLEGRO_EVENT_KEY_DOWN )
+            break;  // quit if press escape
+
+        // mouse operations
+        if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_DOWN)    // 1 is left click, 2 is right click
+            mouse_buttom = event.mouse.button;
+        // end interact with mouse
+        if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP)
+            mouse_buttom = 0;
+
+        if(event.type == ALLEGRO_EVENT_MOUSE_AXES)
         {
-            break;
+            if(mouse_buttom == 1)
+            {
+                x_centre -= event.mouse.dx * scale;
+                y_centre += event.mouse.dy * scale;
+            }
+            else if(mouse_buttom == 2)
+            {
+                c_real += event.mouse.dx * 0.005;
+                c_imag -= event.mouse.dy * 0.005;
+            }
+
+            // scroll, zoom in - positive, zoom out - negative
+            if(event.mouse.dz != 0)
+                scale -= scale * event.mouse.dz * 0.1;
+            if(scale < 1.7e-100)
+                scale = 1.7e-100;
         }
+
         draw(display);
     }
 
-
-
+    al_destroy_display(display);
+    al_uninstall_keyboard();
+    al_uninstall_mouse();
 
     return 0;
 }

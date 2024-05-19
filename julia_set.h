@@ -1,4 +1,4 @@
-#ifdef JULIA_SET_H
+#ifndef JULIA_SET_H
 #define JULIA_SET_H
 
 void julia_set(

@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <allegro5/allegro.h>
 #include "julia_set.h"
-#define WIDTH 800
-#define HEIGHT 800
 
+int WIDTH = 800, HEIGHT = 800;
 double c_real = 0, c_imag = 0;
 double x_centre = 0, y_centre = 0;
 double scale = 0.005;
@@ -16,16 +15,16 @@ void draw(ALLEGRO_DISPLAY *display)
     double disp_x_left = x_centre - WIDTH / 2.0 * scale;
     double disp_y_up = y_centre - HEIGHT / 2.0 * scale;
 
-    ALLEGRO_LOCKED_REGION *locked = al_lock_bitmap(al_get_backbuffer(display), ALLEGRO_PIXEL_FORMAT_RGB_888, ALLEGRO_LOCK_READWRITE);
+    ALLEGRO_LOCKED_REGION *bitmap = al_lock_bitmap(al_get_backbuffer(display), ALLEGRO_PIXEL_FORMAT_RGB_888, ALLEGRO_LOCK_READWRITE);
 
     // debug stuff
     printf("c_real: %f, c_imag: %f\n", c_real, c_imag);
     printf("x_centre: %f, y_centre: %f\n", x_centre, y_centre);
     printf("disp_x_left: %f, disp_y_up: %f\n", disp_x_left, disp_y_up);
     printf("scale: %f\n", scale);
-    printf("locked->pitch: %d\n", locked->pitch);
+    printf("locked->pitch: %d\n", bitmap->pitch);
 
-    julia_set(locked->data, locked->pitch, WIDTH, HEIGHT, c_real, c_imag, scale, disp_x_left, disp_y_up);
+    julia_set(bitmap->data, bitmap->pitch, WIDTH, HEIGHT, c_real, c_imag, scale, disp_x_left, disp_y_up);
 
     al_unlock_bitmap(al_get_backbuffer(display));
     al_flip_display();
@@ -37,7 +36,6 @@ int main()
     // init allegro and modules
     al_init();
     al_install_mouse();
-    al_install_keyboard();
 
     // create display
     ALLEGRO_DISPLAY *display = al_create_display(WIDTH, HEIGHT);
@@ -46,7 +44,6 @@ int main()
     // create event queue
     ALLEGRO_EVENT_QUEUE *event_queue = al_create_event_queue();
     al_register_event_source(event_queue, al_get_mouse_event_source());
-    al_register_event_source(event_queue, al_get_keyboard_event_source());
     al_register_event_source(event_queue, al_get_display_event_source(display));
 
     // create event
@@ -84,19 +81,18 @@ int main()
                 c_real += event.mouse.dx * 0.005;
                 c_imag -= event.mouse.dy * 0.005;
             }
-
-            // scroll, zoom in - positive, zoom out - negative
-            if(event.mouse.dz != 0)
-                scale -= scale * event.mouse.dz * 0.1;
-            if(scale < 1.7e-100)
-                scale = 1.7e-100;
         }
+
+        // scroll, zoom in - positive, zoom out - negative
+        if(event.mouse.dz != 0)
+            scale -= scale * event.mouse.dz * 0.1;
+        if(scale < 1.7e-100)
+            scale = 1.7e-100;
 
         draw(display);
     }
 
     al_destroy_display(display);
-    al_uninstall_keyboard();
     al_uninstall_mouse();
 
     return 0;

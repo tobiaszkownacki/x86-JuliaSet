@@ -6,6 +6,7 @@
 int WIDTH = 800, HEIGHT = 800;
 double c_real = 0, c_imag = 0;
 double x_centre = 0, y_centre = 0;
+double change_c = 20;
 double scale = 0.005;
 
 
@@ -36,6 +37,7 @@ int main()
     // init allegro and modules
     al_init();
     al_install_mouse();
+    al_install_keyboard();
 
     // create display
     ALLEGRO_DISPLAY *display = al_create_display(WIDTH, HEIGHT);
@@ -44,6 +46,7 @@ int main()
     // create event queue
     ALLEGRO_EVENT_QUEUE *event_queue = al_create_event_queue();
     al_register_event_source(event_queue, al_get_mouse_event_source());
+    al_register_event_source(event_queue, al_get_keyboard_event_source());
     al_register_event_source(event_queue, al_get_display_event_source(display));
 
     // create event
@@ -69,30 +72,38 @@ int main()
         if(event.type == ALLEGRO_EVENT_MOUSE_BUTTON_UP)
             mouse_buttom = 0;
 
+        // left click to change x_centre and y_centre
         if(event.type == ALLEGRO_EVENT_MOUSE_AXES)
         {
-            if(mouse_buttom == 1)
+            if(mouse_buttom == 1) // left click
             {
                 x_centre -= event.mouse.dx * scale;
                 y_centre += event.mouse.dy * scale;
             }
-            else if(mouse_buttom == 2)
-            {
-                c_real += event.mouse.dx * 0.005;
-                c_imag -= event.mouse.dy * 0.005;
-            }
+            // scroll, zoom in - positive, zoom out - negative
+            if(event.mouse.dz != 0)
+                scale -= scale * event.mouse.dz * 0.1;
+            if(scale < 1.7e-100)
+                scale = 1.7e-100;
+
         }
-
-        // scroll, zoom in - positive, zoom out - negative
-        if(event.mouse.dz != 0)
-            scale -= scale * event.mouse.dz * 0.1;
-        if(scale < 1.7e-100)
-            scale = 1.7e-100;
-
+        // change c_real and c_imag
+        if(event.type == ALLEGRO_EVENT_KEY_CHAR)
+        {
+            if(event.keyboard.keycode == ALLEGRO_KEY_W)
+                c_imag += change_c * scale;
+            if(event.keyboard.keycode == ALLEGRO_KEY_S)
+                c_imag -= change_c * scale;
+            if(event.keyboard.keycode == ALLEGRO_KEY_A)
+                c_real -= change_c * scale;
+            if(event.keyboard.keycode == ALLEGRO_KEY_D)
+                c_real += change_c * scale;
+        }
         draw(display);
     }
 
     al_destroy_display(display);
+    al_uninstall_keyboard();
     al_uninstall_mouse();
 
     return 0;

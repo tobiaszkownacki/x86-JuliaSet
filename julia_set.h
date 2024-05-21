@@ -2,10 +2,9 @@
 #define JULIA_SET_H
 
 void julia_set(
-    void* data,
-    int pitch,
-    int width,
-    int height,
+    char *data,
+    long long pitch,
+    int height_and_width,
     double c_real,
     double c_imag,
     double scale,

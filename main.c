@@ -3,7 +3,7 @@
 #include <allegro5/allegro.h>
 #include "julia_set.h"
 
-int WIDTH = 800, HEIGHT = 800;
+int HEIGHT_AND_WIDTH = 800;
 double c_real = 0, c_imag = 0;
 double x_centre = 0, y_centre = 0;
 double change_c = 20;
@@ -13,8 +13,8 @@ double scale = 0.005;
 void draw(ALLEGRO_DISPLAY *display)
 {
     // come calculations
-    double disp_x_left = x_centre - WIDTH / 2.0 * scale;
-    double disp_y_up = y_centre - HEIGHT / 2.0 * scale;
+    double disp_x_left = x_centre - HEIGHT_AND_WIDTH / 2.0 * scale;
+    double disp_y_up = y_centre - HEIGHT_AND_WIDTH / 2.0 * scale;
 
     ALLEGRO_LOCKED_REGION *bitmap = al_lock_bitmap(al_get_backbuffer(display), ALLEGRO_PIXEL_FORMAT_RGB_888, ALLEGRO_LOCK_READWRITE);
 
@@ -25,7 +25,7 @@ void draw(ALLEGRO_DISPLAY *display)
     printf("scale: %f\n", scale);
     printf("locked->pitch: %d\n", bitmap->pitch);
 
-    julia_set(bitmap->data, bitmap->pitch, WIDTH, HEIGHT, c_real, c_imag, scale, disp_x_left, disp_y_up);
+    julia_set(bitmap->data, bitmap->pitch, HEIGHT_AND_WIDTH, c_real, c_imag, scale, disp_x_left, disp_y_up);
 
     al_unlock_bitmap(al_get_backbuffer(display));
     al_flip_display();
@@ -40,7 +40,7 @@ int main()
     al_install_keyboard();
 
     // create display
-    ALLEGRO_DISPLAY *display = al_create_display(WIDTH, HEIGHT);
+    ALLEGRO_DISPLAY *display = al_create_display(HEIGHT_AND_WIDTH, HEIGHT_AND_WIDTH);
     al_set_window_title(display, "Julia Set");
 
     // create event queue

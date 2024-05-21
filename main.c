@@ -3,10 +3,10 @@
 #include <allegro5/allegro.h>
 #include "julia_set.h"
 
-int HEIGHT_AND_WIDTH = 500;
+int HEIGHT_AND_WIDTH = 800;
 double c_real = 0, c_imag = 0;
 double x_centre = 0, y_centre = 0;
-double change_c = 20;
+double change_c = 5;
 double scale = 0.005;
 
 
@@ -19,11 +19,10 @@ void draw(ALLEGRO_DISPLAY *display)
     ALLEGRO_LOCKED_REGION *bitmap = al_lock_bitmap(al_get_backbuffer(display), ALLEGRO_PIXEL_FORMAT_RGB_888, ALLEGRO_LOCK_READWRITE);
 
     // debug stuff
-    //printf("c_real: %f, c_imag: %f\n", c_real, c_imag);
-    //printf("x_centre: %f, y_centre: %f\n", x_centre, y_centre);
-    //printf("disp_x_left: %f, disp_y_up: %f\n", disp_x_left, disp_y_up);
-    //printf("scale: %f\n", scale);
-    //printf("locked->pitch: %d\n", bitmap->pitch);
+    printf("c_real: %f, c_imag: %f\n", c_real, c_imag);
+    printf("x_centre: %f, y_centre: %f\n", x_centre, y_centre);
+    printf("disp_x_left: %f, disp_y_up: %f\n", disp_x_left, disp_y_up);
+    printf("scale: %f\n", scale);
 
     julia_set(bitmap->data, bitmap->pitch, HEIGHT_AND_WIDTH, c_real, c_imag, scale, disp_x_left, disp_y_up);
 
@@ -53,6 +52,7 @@ int main()
     ALLEGRO_EVENT event;
 
     int mouse_buttom = 0;
+    bool draw_again = true;
 
     while(true)
     {
@@ -79,27 +79,46 @@ int main()
             {
                 x_centre -= event.mouse.dx * scale;
                 y_centre += event.mouse.dy * scale;
+                draw_again = true;
             }
             // scroll, zoom in - positive, zoom out - negative
             if(event.mouse.dz != 0)
+            {
                 scale -= scale * event.mouse.dz * 0.1;
-            if(scale < 1.7e-100)
-                scale = 1.7e-100;
-
+                draw_again = true;
+            }
         }
         // change c_real and c_imag
         if(event.type == ALLEGRO_EVENT_KEY_CHAR)
         {
             if(event.keyboard.keycode == ALLEGRO_KEY_W)
+            {
                 c_imag += change_c * scale;
+                draw_again = true;
+
+            }
             if(event.keyboard.keycode == ALLEGRO_KEY_S)
+            {
                 c_imag -= change_c * scale;
+                draw_again = true;
+            }
             if(event.keyboard.keycode == ALLEGRO_KEY_A)
+            {
                 c_real -= change_c * scale;
+                draw_again = true;
+            }
             if(event.keyboard.keycode == ALLEGRO_KEY_D)
+            {
                 c_real += change_c * scale;
+                draw_again = true;
+            }
         }
-        draw(display);
+
+        if (draw_again && al_event_queue_is_empty(event_queue))
+        {
+            draw_again = false;
+            draw(display);
+        }
     }
 
     al_destroy_display(display);

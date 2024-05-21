@@ -36,8 +36,8 @@ global julia_set
 
 julia_set:
 
-    push rbp
-    mov rbp, rsp        ; now not needed, but for consistency
+    ;push rbp
+    ;mov rbp, rsp        ; now not needed, but for consistency
 
     ;push xmm6
     ;push xmm7
@@ -45,12 +45,12 @@ julia_set:
     ;push xmm9
     ;push xmm10
 
-    mov r8, rdx         ; r8 = height
-    mov r10, 4          ; convert 4 to double
-    cvtsi2sd xmm10, r10
+    mov r8d, edx         ; r8 = height
+    mov r10d, 4          ; convert 4 to double
+    cvtsi2sd xmm10, r10d
 
 column_loop:
-    mov r9, rdx         ; r9 = width
+    mov r9d, edx         ; r9 = width
     movsd xmm5, xmm3    ; x = x_left movsd - Move scalar Double Precision Floating-Point Values
     xor r10, r10        ; zero index pixel in row arrey
 
@@ -89,7 +89,7 @@ recursive_sequence:
     addsd xmm8, xmm9    ; (newRe * newRe + newIm * newIm)
 
     inc ecx             ; incease number of interations
-    cmp ecx, 200
+    cmp ecx, 255
     jae after_sequence   ; if iterations > 255 go after_sequence
 
     comisd xmm8, xmm10
@@ -123,6 +123,6 @@ epilog:
     ;pop xmm7
     ;pop xmm6
 
-    mov rsp, rbp    ; now not needed, but for consistency
-    pop rbp
+    ;mov rsp, rbp    ; now not needed, but for consistency
+    ;pop rbp
     ret

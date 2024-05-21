@@ -3,7 +3,7 @@
 
 void julia_set(
     char *data,
-    long long pitch,
+    long pitch,
     int height_and_width,
     double c_real,
     double c_imag,

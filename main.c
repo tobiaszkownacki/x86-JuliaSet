@@ -3,7 +3,7 @@
 #include <allegro5/allegro.h>
 #include "julia_set.h"
 
-int HEIGHT_AND_WIDTH = 800;
+int HEIGHT_AND_WIDTH = 500;
 double c_real = 0, c_imag = 0;
 double x_centre = 0, y_centre = 0;
 double change_c = 20;
@@ -14,16 +14,16 @@ void draw(ALLEGRO_DISPLAY *display)
 {
     // come calculations
     double disp_x_left = x_centre - HEIGHT_AND_WIDTH / 2.0 * scale;
-    double disp_y_up = y_centre - HEIGHT_AND_WIDTH / 2.0 * scale;
+    double disp_y_up = y_centre + HEIGHT_AND_WIDTH / 2.0 * scale;
 
     ALLEGRO_LOCKED_REGION *bitmap = al_lock_bitmap(al_get_backbuffer(display), ALLEGRO_PIXEL_FORMAT_RGB_888, ALLEGRO_LOCK_READWRITE);
 
     // debug stuff
-    printf("c_real: %f, c_imag: %f\n", c_real, c_imag);
-    printf("x_centre: %f, y_centre: %f\n", x_centre, y_centre);
-    printf("disp_x_left: %f, disp_y_up: %f\n", disp_x_left, disp_y_up);
-    printf("scale: %f\n", scale);
-    printf("locked->pitch: %d\n", bitmap->pitch);
+    //printf("c_real: %f, c_imag: %f\n", c_real, c_imag);
+    //printf("x_centre: %f, y_centre: %f\n", x_centre, y_centre);
+    //printf("disp_x_left: %f, disp_y_up: %f\n", disp_x_left, disp_y_up);
+    //printf("scale: %f\n", scale);
+    //printf("locked->pitch: %d\n", bitmap->pitch);
 
     julia_set(bitmap->data, bitmap->pitch, HEIGHT_AND_WIDTH, c_real, c_imag, scale, disp_x_left, disp_y_up);
 

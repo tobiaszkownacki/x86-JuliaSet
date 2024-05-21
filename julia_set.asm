@@ -75,7 +75,7 @@ recursive_sequence:
     mulsd xmm6, xmm6    ; oldRe * oldRe
     mulsd xmm7, xmm7    ; oldIm * oldIm
     subsd xmm6, xmm7    ; oldRe * oldRe - oldIm * oldIm
-    addsd xmm6, xmm0
+    addsd xmm6, xmm0    ; newRe = oldRe * oldRe - oldIm * oldIm + cRe;
 
     ; wolne 8 - wartość newIM, 9
 
@@ -89,16 +89,16 @@ recursive_sequence:
     addsd xmm8, xmm9    ; (newRe * newRe + newIm * newIm)
 
     inc ecx             ; incease number of interations
-    cmp ecx, 255
-    ja after_sequence   ; if iterations > 255 go after_sequence
+    cmp ecx, 200
+    jae after_sequence   ; if iterations > 255 go after_sequence
 
     comisd xmm8, xmm10
     jbe recursive_sequence  ; if modul <= 4 go to recursive_sequence
 
 after_sequence:
-    mov byte [rdi + r10], 0        ; draw pixels
-    mov byte [rdi + r10 + 1], 0
-    mov byte [rdi + r10 + 2], 0
+    mov byte [rdi + r10], cl        ; draw pixels
+    mov byte [rdi + r10 + 1], cl
+    mov byte [rdi + r10 + 2], cl
 
     add r10, 3         ; incease index to draw in good place
 
@@ -109,6 +109,7 @@ after_sequence:
 
 end_row_loop:
     add rdi, rsi        ; add pitch to pointer on data to pointer to the next row
+
     subsd xmm4, xmm2    ; sub scale to go to the next pixel
 
     dec r8              ; decrease height counter

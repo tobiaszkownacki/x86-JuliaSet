@@ -3,7 +3,7 @@
 #include <allegro5/allegro.h>
 #include "julia_set.h"
 
-int HEIGHT_AND_WIDTH = 750;
+int HEIGHT_AND_WIDTH = 623;
 double c_real = 0, c_imag = 0;
 double x_centre = 0, y_centre = 0;
 double change_c = 5;

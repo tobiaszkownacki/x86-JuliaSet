@@ -36,17 +36,11 @@ global julia_set
 
 julia_set:
 
-    ;push rbp
-    ;mov rbp, rsp        ; now not needed, but for consistency
-
-    ;push xmm6
-    ;push xmm7
-    ;push xmm8
-    ;push xmm9
-    ;push xmm10
+    push rbp
+    mov rbp, rsp        ; idk if needed
 
     mov r8d, edx         ; r8 = height
-    mov r10d, 4          ; convert 4 to double
+    mov r10d, 4          ; convert 4 to double, needed in recursive_sequence
     cvtsi2sd xmm10, r10d
 
 column_loop:
@@ -76,8 +70,6 @@ recursive_sequence:
     mulsd xmm7, xmm7    ; oldIm * oldIm
     subsd xmm6, xmm7    ; oldRe * oldRe - oldIm * oldIm
     addsd xmm6, xmm0    ; newRe = oldRe * oldRe - oldIm * oldIm + cRe;
-
-    ; wolne 8 - wartość newIM, 9
 
     movsd xmm7, xmm8   ; move newIm to oldIm
 
@@ -117,12 +109,6 @@ end_row_loop:
 
 epilog:
 
-    ;pop xmm10
-    ;pop xmm9
-    ;pop xmm8
-    ;pop xmm7
-    ;pop xmm6
-
-    ;mov rsp, rbp    ; now not needed, but for consistency
-    ;pop rbp
+    mov rsp, rbp    ; now not needed, but for consistency
+    pop rbp
     ret
